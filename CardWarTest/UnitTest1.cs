@@ -43,6 +43,99 @@ namespace CardWarTest
             Assert.IsTrue(card1_lt_card2);
         }
 
+        [TestMethod]
+        public void Card_Value_Success2()
+        {
+            //Arrange
+            Card card1 = new Card(Suite.Clubs, Face.Jack);
+            Card card2 = new Card(Suite.Diamonds, Face.Queen);
+            bool card1_lt_card2;
+
+            //Act
+            card1_lt_card2 = (card1.FaceValue < card2.FaceValue);
+
+            //Assert
+            Assert.IsTrue(card1_lt_card2);
+        }
+
+        [TestMethod]
+        public void Player_CreatePlayerDeck_Success()
+        {
+            //Arrange
+            Player player = new Player();
+            Card heartTwo = new Card(Suite.Hearts, Face.Two);
+            Card heartThree = new Card(Suite.Hearts, Face.Three);
+            Card heartFour = new Card(Suite.Hearts, Face.Four);
+
+            //Act
+            player.AddCard(heartTwo);
+            player.AddCard(heartThree);
+            player.AddCard(heartFour);
+
+            //Assert
+            Assert.AreEqual(3, player.DiscardPile.Count);
+            Assert.AreEqual(0, player.PlayHand.Count);
+        }
+
+        [TestMethod]
+        public void Player_DrawCard_Success()
+        {
+            //Arrange
+            Player player = new Player();
+            Card heartTwo = new Card(Suite.Hearts, Face.Two);
+            Card heartThree = new Card(Suite.Hearts, Face.Three);
+            Card heartFour = new Card(Suite.Hearts, Face.Four);
+
+            //Act
+            player.AddCard(heartTwo);
+            player.AddCard(heartThree);
+            player.AddCard(heartFour);
+
+            //Assert
+            Assert.AreEqual("Hearts", player.DrawCard().Suite);
+            Assert.AreEqual(0, player.DiscardPile.Count);
+            Assert.AreEqual(2, player.PlayHand.Count);
+        }
+
+        [TestMethod]
+        public void Player_DrawCardEmptyDeck_ReturnsException()
+        {
+            //Arraange
+            Player player = new Player();
+
+            //Act
+            try
+            {
+                player.DrawCard();
+            }
+            catch (Exception e)
+            {
+                //Assert
+                StringAssert.Contains(e.Message, "Player is out of cards");
+            }
+        }
+
+        [TestMethod]
+        public void Player_CardCount_ReturnsTotalCards()
+        {
+            //Arrange
+            Player player = new Player();
+            Card heartTwo = new Card(Suite.Hearts, Face.Two);
+            Card heartThree = new Card(Suite.Hearts, Face.Three);
+            Card heartFour = new Card(Suite.Hearts, Face.Four);
+            player.AddCard(heartTwo);
+            player.AddCard(heartThree);
+            player.AddCard(heartFour);
+
+            //Act
+            player.AddCard(player.DrawCard());
+
+            //Assert
+            Assert.AreEqual(3, player.CardCount);
+            Assert.AreEqual(2, player.PlayHand.Count);
+            Assert.AreEqual(1, player.DiscardPile.Count);
+        }
+
         //[TestMethod]
         //public void CreateDeck_Success()
         //{
