@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CardWar
 {
-    public class Card
+    public struct Card
     {
         public Card(Suite suite, Face face)
         {

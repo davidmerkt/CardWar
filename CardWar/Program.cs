@@ -9,167 +9,115 @@ namespace CardWar
 {
     class Program
     {
-        private static List<Card> p1HandDeck;
-        private static List<Card> p1DiscardDeck;
-        private static List<Card> p2HandDeck;
-        private static List<Card> p2DiscardDeck;
         private static List<Card> cardDeck;
-
-        static Player p1 = new Player();
-        static Player p2 = new Player();
-
-        static Card p1GameCard;
-        static Card p2GameCard;
-
+        private static List<Player> players;
 
         static void Main(string[] args)
         {
             CreateNewDeck();
+
+            CreatePlayers(2);
+            Debug.WriteLine("The number of players is: {0}", players.Count);
+
             DistributeNewCards();
 
-            p1DiscardDeck = new List<Card>();
-            p2DiscardDeck = new List<Card>();
-
             StartGame();
-
-            
 
             Console.ReadLine();
         }        
 
         public static void DistributeNewCards()
         {
-            p1HandDeck = new List<Card>();
-            p2HandDeck = new List<Card>();
-
-            Debug.WriteLine("Number of cards in cardDeck: " + cardDeck.Count);
-            Debug.WriteLine("Number of cards in p1 play hand: " + p1.PlayHand.Count + "\nNumber of cards in p1 discard hand: " + p1.DiscardPile.Count);
-            Debug.WriteLine("Number of cards in p2 play hand: " + p2.PlayHand.Count + "\nNumber of cards in p1 discard hand: " + p2.DiscardPile.Count);
+            DebugPrintCardsInEachPlayerHand();
 
             Random random = new Random();
 
             while (cardDeck.Count > 0)
             {
-
-                int cardToPull = random.Next(0, cardDeck.Count - 1);
-
-                if (cardDeck.Count % 2 == 0)
+                for (int i = 0; i < players.Count; i++)
                 {
-                    p1.AddCard(cardDeck[cardToPull]);
+                    if (cardDeck.Count == 0)
+                        break;
+
+                    int cardToPull = random.Next(0, cardDeck.Count - 1);
+                    Debug.WriteLine("\nCard number to pull: " + cardToPull);
+
+                    players[i].AddCard(cardDeck[cardToPull]);
+
                     cardDeck.RemoveAt(cardToPull);
                 }
-                else
-                {
-                    p2.AddCard(cardDeck[cardToPull]);
-                    cardDeck.RemoveAt(cardToPull);
-                }
 
-                Debug.WriteLine("\nCard number to pull: " + cardToPull);
-                Debug.WriteLine("Number of cards in cardDeck: " + cardDeck.Count);
-                Debug.WriteLine("Number of cards in p1 play hand: " + p1.PlayHand.Count + "\nNumber of cards in p1 discard hand: " + p1.DiscardPile.Count);
-                Debug.WriteLine("Number of cards in p2 play hand: " + p2.PlayHand.Count + "\nNumber of cards in p1 discard hand: " + p2.DiscardPile.Count);
+                DebugPrintCardsInEachPlayerHand();
+            }
+        }
+
+        public static void StartGame()
+        {
+            while ((players[0].CardCount > 0) || (players[1].CardCount > 0))
+            {
+                PlayRound();
             }
         }
 
         public static void PlayRound()
         {
-            if ((p1.CardCount > 0) && (p2.CardCount > 0))
+            List<Player> playRoundVictor = new List<Player>();
+
+            for (int i = 0; i < players.Count; i++)
             {
-                p1GameCard = p1.DrawCard();
-                p2GameCard = p2.DrawCard();
-
-                if (p1GameCard.FaceValue == p2GameCard.FaceValue)
+                if (players[i].CardCount > 0)
                 {
-                    War();
-                }
+                    if (playRoundVictor.Count == 0)
+                        playRoundVictor.Add(players[i]);
 
-                else if (p1GameCard.FaceValue > p2GameCard.FaceValue)
-                {
-                    Console.WriteLine("Player 1's " + p1GameCard.FaceOfSuite + " beats Player 2's " + p2GameCard.FaceOfSuite);
-                    p1.AddCard(p1GameCard);
-                    p1.AddCard(p2GameCard);
-                    ListCards(p1.DiscardPile);
-                }
+                    else if (players[i].CheckCard().FaceValue > playRoundVictor[0].CheckCard().FaceValue)
+                    {
+                        playRoundVictor.Clear();
+                        playRoundVictor.Add(players[i]);
+                        Debug.WriteLine("players[{0}] is the current holder of highest value card overturned", i);
+                        Debug.WriteLine("The list size is {0}", playRoundVictor.Count);
+                    }
 
-                else if (p2GameCard.FaceValue > p1GameCard.FaceValue)
-                {
-                    Console.WriteLine("Player 2's " + p2GameCard.FaceOfSuite + " beats Player 1's " + p1GameCard.FaceOfSuite);
-                    p2.AddCard(p1GameCard);
-                    p2.AddCard(p2GameCard);
-                    ListCards(p2.DiscardPile);
+                    else if (players[i].CheckCard().FaceValue == playRoundVictor[0].CheckCard().FaceValue)
+                    {
+                        playRoundVictor.Add(players[i]);
+                        Debug.WriteLine("players[{0}] is added to the list of those competing in War", i);
+                        Debug.WriteLine("The list size is {0}", playRoundVictor.Count);
+                    }
                 }
-
-                Console.WriteLine("\n");
-                Debug.WriteLine("Number of cards in p1 play hand: " + p1.PlayHand.Count + "\nNumber of cards in p1 discard hand: " + p1.DiscardPile.Count);
-                Debug.WriteLine("Number of cards in p2 play hand: " + p2.PlayHand.Count + "\nNumber of cards in p2 discard hand: " + p2.DiscardPile.Count);
             }
+
+            if (playRoundVictor.Count > 1)
+            {
+                Console.WriteLine("\nWar‼");
+                War war = new War(playRoundVictor, players);
+            }
+
+            else
+            {
+                for (int i = 0; i < players.Count; i++)
+                {
+                    if (players[i].CardCount > 0)
+                        playRoundVictor[0].AddCard(players[i].DrawCard());
+                }
+            }
+
+            foreach (Player player in players)
+            {
+                Console.WriteLine("Player\n Cards in hand: {0} \n Cards in discard deck: {1}", player.PlayHand.Count, player.DiscardPile.Count);
+            }
+
+            DebugPrintCardsInEachPlayerHand();
+            Console.WriteLine("\n");
         }
 
-        public static void War()
+        public static void DebugPrintCardsInEachPlayerHand()
         {
-            Console.WriteLine("Player 1's " + p1GameCard.FaceOfSuite + " against Player 2's " + p2GameCard.FaceOfSuite + " can only mean one thing: ");
-            Console.WriteLine("War‼");
+            Debug.WriteLine("\nNumber of cards in cardDeck: " + cardDeck.Count);
 
-            List<Card> p1WarHand = new List<Card>();
-            List<Card> p2WarHand = new List<Card>();
-
-            Card p1WarCard = p1GameCard;
-            Card p2WarCard = p2GameCard;
-
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < players.Count; i++)
             {
-                if (p1.CardCount > 1)
-                {
-                    p1WarHand.Add(p1.DrawCard());
-                }
-                else return;
-            }
-
-            for (int i = 0; i < 3; i++)
-            {
-                if (p2HandDeck.Count > 1)
-                {
-                    p2WarHand.Add(p2.DrawCard());
-                }
-                else return;
-            }
-
-            Card p1WarCard2 = p1.DrawCard();
-            Card p2WarCard2 = p2.DrawCard();
-
-            if (p1WarCard2.FaceValue == p2WarCard2.FaceValue)
-            {
-                Console.WriteLine("Holy crap it's another war. I haven't gotten this far with the game logic…");
-            }
-
-            else if (p1WarCard2.FaceValue > p2WarCard2.FaceValue)
-            {
-                p1.AddCard(p1WarCard);
-                p1.AddCard(p2WarCard);
-                p1WarHand.ForEach(p1.AddCard);
-                p2WarHand.ForEach(p1.AddCard);
-                p1.AddCard(p1WarCard2);
-                p1.AddCard(p2WarCard2);
-            }
-
-            else if (p2WarCard2.FaceValue > p1WarCard2.FaceValue)
-            {
-                p2.AddCard(p1WarCard);
-                p2.AddCard(p2WarCard);
-                p1WarHand.ForEach(p2.AddCard);
-                p2WarHand.ForEach(p2.AddCard);
-                p2.AddCard(p1WarCard2);
-                p2.AddCard(p2WarCard2);
-            }
-
-            //Console.ReadLine();
-        }
-
-        public static void StartGame()
-        {
-            while ((p1.CardCount > 0) || (p2.CardCount > 0))
-            {
-                PlayRound();
+                Debug.WriteLine("Number of cards in players[{0}] play hand: " + players[i].PlayHand.Count + "\nNumber of cards in players[{0}] discard hand: " + players[i].DiscardPile.Count, i);
             }
         }
 
@@ -178,6 +126,16 @@ namespace CardWar
             for (int i = 0; i < cardList.Count; i++)
             {
                 Console.WriteLine(cardList[i].FaceOfSuite);
+            }
+        }
+
+        public static void CreatePlayers(int numberOfPlayers)
+        {
+            players = new List<Player>();
+
+            for (int i = 0; i < numberOfPlayers; i++)
+            {
+                players.Add(new Player());
             }
         }
 

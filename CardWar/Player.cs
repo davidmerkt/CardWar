@@ -22,19 +22,26 @@ namespace CardWar
 
         public int CardCount { get { return (playHand.Count + discardPile.Count); } }
 
-        public Card DrawCard()
+        public Card CheckCard()
         {
-            Debug.WriteLine("\nPlay Hand Size: " + playHand.Count);
             if (playHand.Count == 0)
             {
+                Debug.WriteLine("No cards in PlayHand. Trying to draw from DiscardPile.");
                 shuffleDiscardPileAndAddToPlayHand();
             }
 
             Card cardToReturn = playHand[0];
 
+            return cardToReturn;
+        }
+
+        public Card DrawCard()
+        {
+            Card cardToReturn = CheckCard();
+
             playHand.RemoveAt(0);
 
-            Debug.WriteLine("Play Hand Size: " + playHand.Count);
+            Debug.WriteLine("DrawCard end. PlayHand count: " + playHand.Count + " DiscardPile count: " + discardPile.Count);
 
             return cardToReturn;
         }
@@ -47,19 +54,20 @@ namespace CardWar
 
                 while (discardPile.Count > 0)
                 {
-                    Debug.WriteLine("\nDiscard Pile Size: " + discardPile.Count + "\nPlay Hand Size: " + playHand.Count);
+                    Debug.WriteLine("\nDiscardPile count: " + discardPile.Count + "\nPlayHand Count: " + playHand.Count);
                     int cardToPull = random.Next(0, discardPile.Count - 1);
 
                     playHand.Add(discardPile[cardToPull]);
-                    Debug.WriteLine("Pulling from discard pile: " + discardPile[cardToPull]);
+                    Debug.WriteLine("Pulling from discard pile: " + discardPile[cardToPull].FaceOfSuite);
                     discardPile.RemoveAt(cardToPull);
 
-                    Debug.WriteLine("\nDiscard Pile Size: " + discardPile.Count + "\nPlay Hand Size: " + playHand.Count);
+                    Debug.WriteLine("\nDiscardPile count: " + discardPile.Count + "\nPlayHand Count: " + playHand.Count);
                 }
             }
 
             else if ((discardPile.Count == 0) && (playHand.Count == 0))
             {
+                Debug.WriteLine("Player is out of cards");
                 throw new System.Exception("Player is out of cards");
             }
         }
