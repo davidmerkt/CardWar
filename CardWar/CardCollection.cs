@@ -7,30 +7,39 @@ using System.Threading.Tasks;
 
 namespace CardWar
 {
-    public class Player
+    public class CardCollection
     {
-        private List<Card> playHand = new List<Card>();
+        private string name;
+        private List<Card> drawPile = new List<Card>();
         private List<Card> discardPile = new List<Card>();
 
-        public List<Card> PlayHand { get { return playHand; } }
+        public string Name { get { return name; } }
+        public List<Card> DrawPile { get { return drawPile; } }
         public List<Card> DiscardPile { get { return discardPile; } }
+
+        public CardCollection() { }
+
+        public CardCollection(string name)
+        {
+            this.name = name;
+        }
 
         public void AddCard(Card card)
         {
             discardPile.Add(card);
         }
 
-        public int CardCount { get { return (playHand.Count + discardPile.Count); } }
+        public int CountCard { get { return (drawPile.Count + discardPile.Count); } }
 
         public Card CheckCard()
         {
-            if (playHand.Count == 0)
+            if (drawPile.Count == 0)
             {
                 Debug.WriteLine("No cards in PlayHand. Trying to draw from DiscardPile.");
                 shuffleDiscardPileAndAddToPlayHand();
             }
 
-            Card cardToReturn = playHand[0];
+            Card cardToReturn = drawPile[0];
 
             return cardToReturn;
         }
@@ -39,9 +48,9 @@ namespace CardWar
         {
             Card cardToReturn = CheckCard();
 
-            playHand.RemoveAt(0);
+            drawPile.RemoveAt(0);
 
-            Debug.WriteLine("DrawCard end. PlayHand count: " + playHand.Count + " DiscardPile count: " + discardPile.Count);
+            Debug.WriteLine("DrawCard end. PlayHand count: " + drawPile.Count + " DiscardPile count: " + discardPile.Count);
 
             return cardToReturn;
         }
@@ -54,18 +63,18 @@ namespace CardWar
 
                 while (discardPile.Count > 0)
                 {
-                    Debug.WriteLine("\nDiscardPile count: " + discardPile.Count + "\nPlayHand Count: " + playHand.Count);
+                    Debug.WriteLine("\nDiscardPile count: " + discardPile.Count + "\nPlayHand Count: " + drawPile.Count);
                     int cardToPull = random.Next(0, discardPile.Count - 1);
 
-                    playHand.Add(discardPile[cardToPull]);
+                    drawPile.Add(discardPile[cardToPull]);
                     Debug.WriteLine("Pulling from discard pile: " + discardPile[cardToPull].FaceOfSuite);
                     discardPile.RemoveAt(cardToPull);
 
-                    Debug.WriteLine("\nDiscardPile count: " + discardPile.Count + "\nPlayHand Count: " + playHand.Count);
+                    Debug.WriteLine("\nDiscardPile count: " + discardPile.Count + "\nPlayHand Count: " + drawPile.Count);
                 }
             }
 
-            else if ((discardPile.Count == 0) && (playHand.Count == 0))
+            else if ((discardPile.Count == 0) && (drawPile.Count == 0))
             {
                 Debug.WriteLine("Player is out of cards");
                 throw new System.Exception("Player is out of cards");

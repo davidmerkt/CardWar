@@ -9,12 +9,12 @@ namespace CardWar
 {
     class War
     {
-        private List<Player> warriors;
-        private List<Player> players;
+        private List<CardCollection> warriors;
+        private List<CardCollection> players;
         private List<Card> spoilsOfWar;
-        private List<Player> warVictor;
+        private List<CardCollection> warVictor;
 
-        public War(List<Player> warriors, List<Player> playerList)
+        public War(List<CardCollection> warriors, List<CardCollection> playerList)
         {
             this.warriors = warriors;
             this.players = playerList;
@@ -25,7 +25,7 @@ namespace CardWar
             distributeSpoilsOfWar(warVictor, players);
         }
 
-        private void distributeSpoilsOfWar(List<Player> warVictor, List<Player> players)
+        private void distributeSpoilsOfWar(List<CardCollection> warVictor, List<CardCollection> players)
         {
             if (warVictor.Count == 1)
                 spoilsOfWar.ForEach(warVictor[0].AddCard);
@@ -33,11 +33,11 @@ namespace CardWar
                 throw new Exception("Multiple warVictors detected when only one expected");
         }
 
-        private void gatherSpoilsOfWar(List<Player> warriors, List<Player> playerList)
+        private void gatherSpoilsOfWar(List<CardCollection> warriors, List<CardCollection> playerList)
         {
             for (int i = 0; i < playerList.Count; i++)
             {
-                if (playerList[i].CardCount > 0)
+                if (playerList[i].CountCard > 0)
                     spoilsOfWar.Add(playerList[i].DrawCard());
             }
 
@@ -45,7 +45,7 @@ namespace CardWar
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    if (warriors[i].CardCount > 1)
+                    if (warriors[i].CountCard > 1)
                     {
                         spoilsOfWar.Add(warriors[i].DrawCard());
                     }
@@ -53,9 +53,9 @@ namespace CardWar
             }
         }
 
-        private void playRound(List<Player> warriors)
+        private void playRound(List<CardCollection> warriors)
         {
-            warVictor = new List<Player>();
+            warVictor = new List<CardCollection>();
 
             for (int i = 0; i < warriors.Count; i++)
             {
@@ -88,14 +88,14 @@ namespace CardWar
             {
                 for (int i = 0; i < warriors.Count; i++)
                 {
-                    if (warriors[i].CardCount > 0)
+                    if (warriors[i].CountCard > 0)
                         spoilsOfWar.Add(warriors[i].DrawCard());
                 }
             }
 
-            foreach (Player warrior in warriors)
+            foreach (CardCollection warrior in warriors)
             {
-                Console.WriteLine("Player\n Cards in hand: {0} \n Cards in discard deck: {1}", warrior.PlayHand.Count, warrior.DiscardPile.Count);
+                Console.WriteLine("Player\n Cards in hand: {0} \n Cards in discard deck: {1}", warrior.DrawPile.Count, warrior.DiscardPile.Count);
             }
 
             Console.WriteLine("\n");

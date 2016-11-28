@@ -59,10 +59,12 @@ namespace CardWarTest
         }
 
         [TestMethod]
-        public void Player_CreatePlayerDeck_Success()
+        public void CardCollection_CreatePlayerDeck_Success()
         {
             //Arrange
-            Player player = new Player();
+            string ExpectedPlayerName = "player";
+            string ActualPlayerName;
+            CardCollection player = new CardCollection(ExpectedPlayerName);
             Card heartTwo = new Card(Suite.Hearts, Face.Two);
             Card heartThree = new Card(Suite.Hearts, Face.Three);
             Card heartFour = new Card(Suite.Hearts, Face.Four);
@@ -71,17 +73,19 @@ namespace CardWarTest
             player.AddCard(heartTwo);
             player.AddCard(heartThree);
             player.AddCard(heartFour);
+            ActualPlayerName = player.Name;
 
             //Assert
             Assert.AreEqual(3, player.DiscardPile.Count);
-            Assert.AreEqual(0, player.PlayHand.Count);
+            Assert.AreEqual(0, player.DrawPile.Count);
+            Assert.AreEqual(ExpectedPlayerName, ActualPlayerName);
         }
 
         [TestMethod]
-        public void Player_DrawCard_Success()
+        public void CardCollection_DrawCard_Success()
         {
             //Arrange
-            Player player = new Player();
+            CardCollection player = new CardCollection();
             Card heartTwo = new Card(Suite.Hearts, Face.Two);
             Card heartThree = new Card(Suite.Hearts, Face.Three);
             Card heartFour = new Card(Suite.Hearts, Face.Four);
@@ -94,14 +98,14 @@ namespace CardWarTest
             //Assert
             Assert.AreEqual("Hearts", player.DrawCard().Suite);
             Assert.AreEqual(0, player.DiscardPile.Count);
-            Assert.AreEqual(2, player.PlayHand.Count);
+            Assert.AreEqual(2, player.DrawPile.Count);
         }
 
         [TestMethod]
-        public void Player_DrawCardEmptyDeck_ReturnsException()
+        public void CardCollection_DrawCardEmptyDeck_ReturnsException()
         {
             //Arraange
-            Player player = new Player();
+            CardCollection player = new CardCollection();
 
             //Act
             try
@@ -116,10 +120,10 @@ namespace CardWarTest
         }
 
         [TestMethod]
-        public void Player_CardCount_ReturnsTotalCards()
+        public void CardCollection_CardCount_ReturnsTotalCards()
         {
             //Arrange
-            Player player = new Player();
+            CardCollection player = new CardCollection();
             Card heartTwo = new Card(Suite.Hearts, Face.Two);
             Card heartThree = new Card(Suite.Hearts, Face.Three);
             Card heartFour = new Card(Suite.Hearts, Face.Four);
@@ -131,8 +135,8 @@ namespace CardWarTest
             player.AddCard(player.DrawCard());
 
             //Assert
-            Assert.AreEqual(3, player.CardCount);
-            Assert.AreEqual(2, player.PlayHand.Count);
+            Assert.AreEqual(3, player.CountCard);
+            Assert.AreEqual(2, player.DrawPile.Count);
             Assert.AreEqual(1, player.DiscardPile.Count);
         }
 

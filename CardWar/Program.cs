@@ -9,8 +9,8 @@ namespace CardWar
 {
     class Program
     {
-        private static List<Card> cardDeck;
-        private static List<Player> players;
+        private static CardCollection cardDeck;
+        private static List<CardCollection> players;
 
         static void Main(string[] args)
         {
@@ -32,19 +32,14 @@ namespace CardWar
 
             Random random = new Random();
 
-            while (cardDeck.Count > 0)
+            while (cardDeck.CountCard > 0)
             {
                 for (int i = 0; i < players.Count; i++)
                 {
-                    if (cardDeck.Count == 0)
+                    if (cardDeck.CountCard == 0)
                         break;
 
-                    int cardToPull = random.Next(0, cardDeck.Count - 1);
-                    Debug.WriteLine("\nCard number to pull: " + cardToPull);
-
-                    players[i].AddCard(cardDeck[cardToPull]);
-
-                    cardDeck.RemoveAt(cardToPull);
+                    players[i].AddCard(cardDeck.DrawCard());
                 }
 
                 DebugPrintCardsInEachPlayerHand();
@@ -53,7 +48,7 @@ namespace CardWar
 
         public static void StartGame()
         {
-            while ((players[0].CardCount > 0) || (players[1].CardCount > 0))
+            while ((players[0].CountCard > 0) || (players[1].CountCard > 0))
             {
                 PlayRound();
             }
@@ -61,11 +56,11 @@ namespace CardWar
 
         public static void PlayRound()
         {
-            List<Player> playRoundVictor = new List<Player>();
+            List<CardCollection> playRoundVictor = new List<CardCollection>();
 
             for (int i = 0; i < players.Count; i++)
             {
-                if (players[i].CardCount > 0)
+                if (players[i].CountCard > 0)
                 {
                     if (playRoundVictor.Count == 0)
                         playRoundVictor.Add(players[i]);
@@ -97,14 +92,14 @@ namespace CardWar
             {
                 for (int i = 0; i < players.Count; i++)
                 {
-                    if (players[i].CardCount > 0)
+                    if (players[i].CountCard > 0)
                         playRoundVictor[0].AddCard(players[i].DrawCard());
                 }
             }
 
-            foreach (Player player in players)
+            foreach (CardCollection player in players)
             {
-                Console.WriteLine("Player\n Cards in hand: {0} \n Cards in discard deck: {1}", player.PlayHand.Count, player.DiscardPile.Count);
+                Console.WriteLine("Player {2}\n Cards in hand: {0} \n Cards in discard deck: {1}", player.DrawPile.Count, player.DiscardPile.Count, player.Name);
             }
 
             DebugPrintCardsInEachPlayerHand();
@@ -113,11 +108,9 @@ namespace CardWar
 
         public static void DebugPrintCardsInEachPlayerHand()
         {
-            Debug.WriteLine("\nNumber of cards in cardDeck: " + cardDeck.Count);
-
             for (int i = 0; i < players.Count; i++)
             {
-                Debug.WriteLine("Number of cards in players[{0}] play hand: " + players[i].PlayHand.Count + "\nNumber of cards in players[{0}] discard hand: " + players[i].DiscardPile.Count, i);
+                Debug.WriteLine("Number of cards in players[{0}] play hand: " + players[i].DrawPile.Count + "\nNumber of cards in players[{0}] discard hand: " + players[i].DiscardPile.Count, i);
             }
         }
 
@@ -131,17 +124,18 @@ namespace CardWar
 
         public static void CreatePlayers(int numberOfPlayers)
         {
-            players = new List<Player>();
+            players = new List<CardCollection>();
 
             for (int i = 0; i < numberOfPlayers; i++)
             {
-                players.Add(new Player());
+                string PlayerName = ("player" + i);
+                players.Add(new CardCollection(PlayerName));
             }
         }
 
         public static void CreateNewDeck()
         {
-            cardDeck = new List<Card>();
+            cardDeck = new CardCollection();
 
             Card clubTwo = new Card(Suite.Clubs, Face.Two);
             Card clubThree = new Card(Suite.Clubs, Face.Three);
@@ -200,58 +194,58 @@ namespace CardWar
             Card spadeKing = new Card(Suite.Spades, Face.King);
             Card spadeAce = new Card(Suite.Spades, Face.Ace);
 
-            cardDeck.Add(clubTwo);
-            cardDeck.Add(clubThree);
-            cardDeck.Add(clubFour);
-            cardDeck.Add(clubFive);
-            cardDeck.Add(clubSix);
-            cardDeck.Add(clubSeven);
-            cardDeck.Add(clubEight);
-            cardDeck.Add(clubNine);
-            cardDeck.Add(clubTen);
-            cardDeck.Add(clubJack);
-            cardDeck.Add(clubQueen);
-            cardDeck.Add(clubKing);
-            cardDeck.Add(clubAce);
-            cardDeck.Add(diamondTwo);
-            cardDeck.Add(diamondThree);
-            cardDeck.Add(diamondFour);
-            cardDeck.Add(diamondFive);
-            cardDeck.Add(diamondSix);
-            cardDeck.Add(diamondSeven);
-            cardDeck.Add(diamondEight);
-            cardDeck.Add(diamondNine);
-            cardDeck.Add(diamondTen);
-            cardDeck.Add(diamondJack);
-            cardDeck.Add(diamondQueen);
-            cardDeck.Add(diamondKing);
-            cardDeck.Add(diamondAce);
-            cardDeck.Add(heartTwo);
-            cardDeck.Add(heartThree);
-            cardDeck.Add(heartFour);
-            cardDeck.Add(heartFive);
-            cardDeck.Add(heartSix);
-            cardDeck.Add(heartSeven);
-            cardDeck.Add(heartEight);
-            cardDeck.Add(heartNine);
-            cardDeck.Add(heartTen);
-            cardDeck.Add(heartJack);
-            cardDeck.Add(heartQueen);
-            cardDeck.Add(heartKing);
-            cardDeck.Add(heartAce);
-            cardDeck.Add(spadeTwo);
-            cardDeck.Add(spadeThree);
-            cardDeck.Add(spadeFour);
-            cardDeck.Add(spadeFive);
-            cardDeck.Add(spadeSix);
-            cardDeck.Add(spadeSeven);
-            cardDeck.Add(spadeEight);
-            cardDeck.Add(spadeNine);
-            cardDeck.Add(spadeTen);
-            cardDeck.Add(spadeJack);
-            cardDeck.Add(spadeQueen);
-            cardDeck.Add(spadeKing);
-            cardDeck.Add(spadeAce);
+            cardDeck.AddCard(clubTwo);
+            cardDeck.AddCard(clubThree);
+            cardDeck.AddCard(clubFour);
+            cardDeck.AddCard(clubFive);
+            cardDeck.AddCard(clubSix);
+            cardDeck.AddCard(clubSeven);
+            cardDeck.AddCard(clubEight);
+            cardDeck.AddCard(clubNine);
+            cardDeck.AddCard(clubTen);
+            cardDeck.AddCard(clubJack);
+            cardDeck.AddCard(clubQueen);
+            cardDeck.AddCard(clubKing);
+            cardDeck.AddCard(clubAce);
+            cardDeck.AddCard(diamondTwo);
+            cardDeck.AddCard(diamondThree);
+            cardDeck.AddCard(diamondFour);
+            cardDeck.AddCard(diamondFive);
+            cardDeck.AddCard(diamondSix);
+            cardDeck.AddCard(diamondSeven);
+            cardDeck.AddCard(diamondEight);
+            cardDeck.AddCard(diamondNine);
+            cardDeck.AddCard(diamondTen);
+            cardDeck.AddCard(diamondJack);
+            cardDeck.AddCard(diamondQueen);
+            cardDeck.AddCard(diamondKing);
+            cardDeck.AddCard(diamondAce);
+            cardDeck.AddCard(heartTwo);
+            cardDeck.AddCard(heartThree);
+            cardDeck.AddCard(heartFour);
+            cardDeck.AddCard(heartFive);
+            cardDeck.AddCard(heartSix);
+            cardDeck.AddCard(heartSeven);
+            cardDeck.AddCard(heartEight);
+            cardDeck.AddCard(heartNine);
+            cardDeck.AddCard(heartTen);
+            cardDeck.AddCard(heartJack);
+            cardDeck.AddCard(heartQueen);
+            cardDeck.AddCard(heartKing);
+            cardDeck.AddCard(heartAce);
+            cardDeck.AddCard(spadeTwo);
+            cardDeck.AddCard(spadeThree);
+            cardDeck.AddCard(spadeFour);
+            cardDeck.AddCard(spadeFive);
+            cardDeck.AddCard(spadeSix);
+            cardDeck.AddCard(spadeSeven);
+            cardDeck.AddCard(spadeEight);
+            cardDeck.AddCard(spadeNine);
+            cardDeck.AddCard(spadeTen);
+            cardDeck.AddCard(spadeJack);
+            cardDeck.AddCard(spadeQueen);
+            cardDeck.AddCard(spadeKing);
+            cardDeck.AddCard(spadeAce);
         }
     }
 }
